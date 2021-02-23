@@ -9,9 +9,9 @@ public class App {
     public static void main(String[] args) {
         Counter counter = new Counter();
         Thread myRunnable = new Thread(new MyRunnable(counter, INCREMENT_TO));
-        MyThread myThread = new MyThread(counter, INCREMENT_TO);
         logger.info("Starting MyRunnable");
         myRunnable.start();
+        MyThread myThread = new MyThread(counter, INCREMENT_TO);
         logger.info("Starting MyThread");
         myThread.start();
     }
