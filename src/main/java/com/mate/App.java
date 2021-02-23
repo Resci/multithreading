@@ -11,7 +11,7 @@ public class App {
         Thread myRunnable = new Thread(new MyRunnable(counter, INCREMENT_TO));
         logger.info("Starting MyRunnable");
         myRunnable.start();
-        MyThread myThread = new MyThread(counter, INCREMENT_TO);
+        Thread myThread = new MyThread(counter, INCREMENT_TO);
         logger.info("Starting MyThread");
         myThread.start();
     }
