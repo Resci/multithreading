@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
-public class MyTask extends RecursiveTask<Long> {
+public class SumOfListRecursiveTask extends RecursiveTask<Long> {
     private static final int THRESHOLD = 50000;
     private List<Integer> list;
 
-    public MyTask(List<Integer> list) {
+    public SumOfListRecursiveTask(List<Integer> list) {
         this.list = list;
     }
 
@@ -25,10 +25,10 @@ public class MyTask extends RecursiveTask<Long> {
         return processing();
     }
 
-    private Collection<MyTask> createSubtasks(List<Integer> list) {
-        List<MyTask> dividedTasks = new ArrayList<>();
-        dividedTasks.add(new MyTask(list.subList(0, list.size() / 2)));
-        dividedTasks.add(new MyTask(list.subList(list.size() / 2, list.size())));
+    private Collection<SumOfListRecursiveTask> createSubtasks(List<Integer> list) {
+        List<SumOfListRecursiveTask> dividedTasks = new ArrayList<>();
+        dividedTasks.add(new SumOfListRecursiveTask(list.subList(0, list.size() / 2)));
+        dividedTasks.add(new SumOfListRecursiveTask(list.subList(list.size() / 2, list.size())));
         return dividedTasks;
     }
 

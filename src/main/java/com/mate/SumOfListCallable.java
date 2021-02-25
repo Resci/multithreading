@@ -3,10 +3,10 @@ package com.mate;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public class MyCallable implements Callable<Long> {
+public class SumOfListCallable implements Callable<Long> {
     private final List<Integer> list;
 
-    public MyCallable(List<Integer> list) {
+    public SumOfListCallable(List<Integer> list) {
         this.list = list;
     }
 

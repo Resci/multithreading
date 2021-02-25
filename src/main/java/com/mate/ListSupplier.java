@@ -4,10 +4,10 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Util {
+public class ListSupplier {
     private final List<Integer> list;
 
-    public Util(int listSize, int maxNumber) {
+    public ListSupplier(int listSize, int maxNumber) {
         SecureRandom random = new SecureRandom();
         list = new ArrayList<>();
         for (int i = 0; i < listSize; i++) {
