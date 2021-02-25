@@ -33,8 +33,6 @@ public class SumOfListExecutorServiceImpl {
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Thread interrupted", e);
-        } finally {
-            executorService.shutdown();
         }
         return executorServiceSum;
     }
