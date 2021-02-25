@@ -2,7 +2,13 @@ package com.mate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
 
@@ -13,48 +19,50 @@ public class App {
     private static final int MAX_NUMBER = 10;
     private static final int THREAD_NUMBER = 6;
 
-
     public static void main(String[] args) throws InterruptedException {
-        //threadRace();
-        logger.info("Number of threads: " + THREAD_NUMBER);
+        threadRace();
         sumOfMillionElements();
     }
 
     private static void sumOfMillionElements() {
-        long time;
         Util util = new Util(LIST_SIZE, MAX_NUMBER);
-        List<List<Integer>> separatedList = ListUtils.partition(util.getList(), (LIST_SIZE / THREAD_NUMBER) + 1);
-        List<Callable<Integer>> callables = new ArrayList<>();
+        List<Integer> targetList = util.getList();
+        logger.info("Start calculating using ExecutorService");
+        long executorServiceSum = sumOfListExecutorService(targetList);
+        logger.info("Sum of list using ExecutorService: " + executorServiceSum);
+        logger.info("Start calculating using ForkJoinPool");
+        long forkJoinSum = sumOfListForkJoinPool(targetList);
+        logger.info("Sum of list using ForkJoinPool: " + forkJoinSum);
+        logger.info(executorServiceSum == forkJoinSum ? "Results equals" : "Results not equals");
+    }
+
+    private static long sumOfListForkJoinPool(List<Integer> targetList) {
+        ForkJoinPool forkJoinPool = new ForkJoinPool(THREAD_NUMBER);
+        ForkJoinTask<Long> task = new MyTask(targetList);
+        return forkJoinPool.invoke(task);
+    }
+
+    private static long sumOfListExecutorService(List<Integer> targetList) {
+        List<List<Integer>> separatedList =
+                ListUtils.partition(targetList, (LIST_SIZE / THREAD_NUMBER) + 1);
+        List<Callable<Long>> callables = new ArrayList<>();
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            Callable<Integer> sumOfList = new MyCallable(separatedList.get(i));
+            Callable<Long> sumOfList = new MyCallable(separatedList.get(i));
             callables.add(sumOfList);
         }
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        int listSum = 0;
+        ExecutorService executorService = Executors.newFixedThreadPool(THREAD_NUMBER);
+        long executorServiceSum = 0;
         try {
-            time = System.currentTimeMillis();
-            List<Future<Integer>> futures = executorService.invokeAll(callables);
-            for (Future<Integer> future: futures) {
-                listSum += future.get();
+            List<Future<Long>> futures = executorService.invokeAll(callables);
+            for (Future<Long> future: futures) {
+                executorServiceSum += future.get();
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Thread interrupted", e);
-        }finally {
+        } finally {
             executorService.shutdown();
         }
-
-        logger.info("Sum with multithreading time: " + (System.currentTimeMillis() - time));
-        time = System.currentTimeMillis();
-        int sum = util.getList().stream().mapToInt(i -> i).sum();
-        sum ++;
-        logger.info("Sum with stream time: " + (System.currentTimeMillis() - time));
-        sum = 0;
-        List<Integer> list = util.getList();
-        time = System.currentTimeMillis();
-        for (Integer i: list) {
-            sum += i;
-        }
-        logger.info("Sum with cycle time: " + (System.currentTimeMillis() - time));
+        return executorServiceSum;
     }
 
     private static void threadRace() {
