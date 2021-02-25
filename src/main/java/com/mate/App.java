@@ -36,13 +36,13 @@ public class App {
         logger.info(executorServiceSum == forkJoinSum ? "Results equals" : "Results not equals");
     }
 
-    private static long sumOfListForkJoinPool(List<Integer> targetList) {
+    public static long sumOfListForkJoinPool(List<Integer> targetList) {
         ForkJoinPool forkJoinPool = new ForkJoinPool(THREAD_NUMBER);
         ForkJoinTask<Long> task = new MyTask(targetList);
         return forkJoinPool.invoke(task);
     }
 
-    private static long sumOfListExecutorService(List<Integer> targetList) {
+    public static long sumOfListExecutorService(List<Integer> targetList) {
         List<List<Integer>> separatedList =
                 ListUtils.partition(targetList, (LIST_SIZE / THREAD_NUMBER) + 1);
         List<Callable<Long>> callables = new ArrayList<>();
