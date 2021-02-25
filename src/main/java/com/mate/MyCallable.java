@@ -11,7 +11,7 @@ public class MyCallable implements Callable<Long> {
     }
 
     @Override
-    public Long call() throws Exception {
+    public Long call() {
         long sum = 0;
         for (int i : list) {
             sum += i;
